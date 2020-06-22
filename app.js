@@ -24,6 +24,9 @@ app.use((req,res,next) => {
 
 
 //Import routes
+const userRoutes = require("./routes/user");
+app.use('/user', userRoutes);
+
 const driverRoutes =  require('./routes/driver');
 app.use ('/driver', driverRoutes);
 
@@ -43,6 +46,7 @@ app.use((error, req, res, next) => {
             message: error.message
         }
     })
+    res.end();
 });
 
 //Routes
@@ -56,7 +60,9 @@ mongoose.connect(
     { useNewUrlParser: true, useUnifiedTopology: true  },
     () => console.log("connected to MongoDB")
 );  
-
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
 mongoose.Promise = global.Promise;
 
 //Listening to the server

@@ -2,8 +2,9 @@ const express = require ('express');
 const router =  express.Router();
 const Post = require('../models/post');
 const Mongoose = require('mongoose');
+const checkAuth = require("../middleware/check-auth")
 
-router.get('/', async (req, res, next)=> {
+router.get('/', checkAuth, async (req, res, next)=> {
     try {
         const posts = await Post.find().select("name destination from time").exec();
         res.status(200).json({
@@ -24,11 +25,11 @@ router.get('/', async (req, res, next)=> {
         });
     }
     catch(err){
-        res.status(500).json({message:err});
+        res.status(500).json({error:err});
     }
 });
 
-router.get('/:driverId', async (req, res, next)=> {
+router.get('/:driverId', checkAuth, async (req, res, next)=> {
     const id = req.params.driverId;
     try {
         const post = await Post.findById(id)
@@ -47,7 +48,7 @@ router.get('/:driverId', async (req, res, next)=> {
     }
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/', checkAuth, async (req, res, next) => {
     const post = new Post ({
         _id: new Mongoose.Types.ObjectId(),
         name : req.body.name,
@@ -73,15 +74,15 @@ router.post('/', async (req, res, next) => {
         });
     }
     catch (err){
-        res.status(500).json({message :err});
+        res.status(500).json({error :err});
     }  
 });
 
-router.delete("/:driverId", async (req, res, next) => {
+router.delete("/:driverId", checkAuth, async (req, res, next) => {
     const id = req.params.driverId;
     try{
         await Post.deleteOne({_id: id});
-        res.status(200).json({message: "entry  " + id  + " has been removed"}); //the message shows up when trying to remove valid ID that did not exist in database (could be a source of error)
+        res.status(200).json({message: "Post  " + id  + " has been removed"}); //the message shows up when trying to remove valid ID that did not exist in database (could be a source of error)
     }
     catch(err){
         res.status(500).json({
